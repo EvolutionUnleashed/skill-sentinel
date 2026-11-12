@@ -31,6 +31,15 @@ Works with Claude Projects, Claude Code, Manus, and any agent platform that supp
 
 Every scan produces a Threat Assessment Report containing an overall risk rating (CLEAN / LOW / MEDIUM / HIGH / CRITICAL), per-category findings with exact evidence from the scanned files, and actionable remediation steps when issues are detected.
 
+Reports also include inventory coverage and a COMPLETE / INCOMPLETE status. Unresolved
+files, runtime dependencies, or inspection limits block approval and carry at least HIGH
+risk. CLEAN requires complete coverage and no findings; it is not a guarantee of safety.
+Compiled Python bytecode (including `__pycache__`) and other uninspectable executable
+artifacts cannot be cleared by reading companion source or strings. The agent records
+the gap and recommends a source-only replacement or dedicated isolated static analysis.
+It never runs target code during a scan. These are agent instructions, not a runtime
+enforcement mechanism. See [benign regression checks](tests/README.md).
+
 ## About Evolution Unleashed
 
 Skill Sentinel is built by [Evolution Unleashed](https://www.evolutionunleashed.com), a 55,000+ member AI education community teaching non-technical entrepreneurs how to orchestrate AI agents. Founded by JJ (Stu Jordan), "The Agent Guy," Evolution Unleashed focuses on moving entrepreneurs from Generator to Orchestrator.
