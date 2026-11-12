@@ -1,41 +1,78 @@
 # Skill Sentinel
 
-**AI Agent Skill Security Scanner by Evolution Unleashed**
+**AI agent skill security review by Evolution Unleashed**
 
-Skill Sentinel analyzes AI agent skills for malicious code, prompt injection, data exfiltration, and supply chain threats before they execute in your environment. Drop it into your Claude Projects, Manus, or any SKILL.md-compatible agent workspace and it automatically scans new skills against eight threat categories derived from real-world attack patterns.
+Skill Sentinel reviews unfamiliar skills before use and gives the owner an evidence-backed
+installation decision. It combines an agent's contextual review with an optional small,
+standard-library helper that checks inventory, package identity and verdict consistency.
 
-## The Problem
+## What you get
 
-The agent skills ecosystem has a supply chain security crisis. Research from Snyk and Cisco in early 2026 confirmed that over 13% of publicly available skills contain critical security issues, with confirmed malicious payloads designed for credential theft, backdoor installation, and data exfiltration. A single compromised skill inherits your agent's full permissions — filesystem access, environment variables, network connectivity, and credentials.
+- A decision: **PROCEED**, **REVIEW** or **BLOCK**, with the next action.
+- Separate scan coverage and observed threat severity, so unknown contents are not called malware.
+- Evidence against eight categories: exfiltration, injection, unsafe execution, credential exposure,
+  hidden behavior, excessive authority, supply-chain risk and deception.
+- The package's read/write paths, network destinations, execution capabilities and unresolved dependencies.
 
-## What It Detects
+Python bytecode, disguised executables and other unverified artifacts block approval.
+Harmless companion source cannot clear compiled code. Target code is never executed
+as part of a scan. A CLEAN result means no findings within a complete review of those
+bytes; it does not guarantee safety or cover later changes.
 
-Skill Sentinel scans against eight threat categories covering every confirmed attack pattern documented in the wild:
+## Use it
 
-- **T1: Data Exfiltration** — Instructions that transmit sensitive data to external endpoints
-- **T2: Prompt Injection** — Embedded instructions that override agent safety guidelines
-- **T3: Remote Code Execution** — Download-and-execute patterns from external sources
-- **T4: Credential Harvesting** — Unauthorized access to API keys, tokens, and passwords
-- **T5: Obfuscated Payloads** — Base64, hex, Unicode, and other encoding used to hide malicious intent
-- **T6: Privilege Escalation** — Permissions that exceed the skill's stated purpose
-- **T7: Supply Chain Compromise** — Unverified external dependencies and runtime remote fetching
-- **T8: Social Engineering** — Misleading descriptions and trust manipulation tactics
+Add the trusted Sentinel folder to an agent workspace that supports SKILL.md skills,
+then ask it to review a separate target skill before installation. Prompt-only hosts use
+**ADVISORY** mode. The methodology works without installing packages or external scanners.
 
-## How To Use It
+For **GATED** mode, use the trusted `scripts/preflight.py` with Python 3.10+ on a POSIX
+host and a frozen local target. The agent follows [the assessment contract](references/assessment-format.md):
 
-Download the `skill-sentinel` folder and add it to your agent workspace as a skill. When you add a new skill or ask your agent to scan an existing one, Skill Sentinel activates and produces a structured Threat Assessment Report with severity ratings, evidence citations, and remediation guidance.
+1. Inventory and fingerprint the supplied package.
+2. Review its readable content and record coverage, findings and capabilities.
+3. Re-inventory and validate the assessment; consume the helper's derived decision.
 
-Works with Claude Projects, Claude Code, Manus, and any agent platform that supports SKILL.md skill files.
+The helper enforces fixed conservative limits and never trusts a model to remove its
+blockers. It blocks opaque assets, containers and all links; use a source-only package
+or a separate specialist assessment when necessary. Windows and restricted hosts retain
+advisory review. The helper cannot prove that a model understood the content or enforce
+the host's runtime permissions. It detects observed changes; a frozen snapshot and an
+installation-time identity check are still required.
 
-## Output
+The existing overall rating remains for compatibility: incomplete coverage carries at
+least HIGH, while actual findings are shown separately. **Use the decision field** for
+installation gating. Never interpret “no observed threats” as approval for an incomplete scan.
 
-Every scan produces a Threat Assessment Report containing an overall risk rating (CLEAN / LOW / MEDIUM / HIGH / CRITICAL), per-category findings with exact evidence from the scanned files, and actionable remediation steps when issues are detected.
+## Validation
+
+Run the trusted tests from this repository:
+
+```sh
+python3 -I -B tests/regression.py
+python3 -I -B tests/test_preflight.py
+python3 -I -B tests/test_evaluation.py
+```
+
+[Benign regression fixtures](tests/README.md) exercise compiled formats and controls.
+[The evaluation procedure](references/evaluation.md) records false alarms, missed threats,
+unsupported CLEAN results and unsafe scan actions across hosts/models. Automated helper
+tests and model evaluations are reported separately. No reporter payload is required.
+
+## Research and limits
+
+A February 2026 Snyk study found critical issues in 13.4% of its 3,984-skill sample.
+That is a dated sample, not a current prevalence claim for every registry.
+[Research source](https://research.snyk.io/blog/agent-skills-threat-landscape/).
+
+Current [specialist-review guidance](references/specialist-review.md) documents the
+boundary between agent reasoning, dedicated static analysis and runtime enforcement.
+Sentinel cannot guarantee detection of every attack. Least privilege, isolation and
+appropriate human approval remain responsibilities of the agent host.
 
 ## About Evolution Unleashed
 
-Skill Sentinel is built by [Evolution Unleashed](https://www.evolutionunleashed.com), a 55,000+ member AI education community teaching non-technical entrepreneurs how to orchestrate AI agents. Founded by JJ (Stu Jordan), "The Agent Guy," Evolution Unleashed focuses on moving entrepreneurs from Generator to Orchestrator.
-
-**Learn more:** [www.evolutionunleashed.com](https://www.evolutionunleashed.com)
+Created by JJ (Stu Jordan), Evolution Unleashed helps entrepreneurs put AI agents and
+repeatable systems to work. [Evolution Unleashed](https://www.evolutionunleashed.com).
 
 ## License
 
